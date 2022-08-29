@@ -1,0 +1,87 @@
+import glob
+from PIL import Image
+import numpy as np
+
+slika = Image.open("C:/Users/djordje/Desktop/DARK/2021-08-18-2014_5-CapObj_0397.png")
+width, height = slika.size
+
+pixels = slika.load()
+
+r = np.zeros((width,height))
+g = np.zeros((width,height))
+b = np.zeros((width,height))
+r1 = np.zeros(width*height)
+g1 = np.zeros(width*height)
+b1 = np.zeros(width*height)
+
+count =  0
+
+for img in glob.glob("C:/Users/djordje/Desktop/DARK/*.png"):
+    slika = Image.open(img)
+    a = 0
+    for i in range(width):
+        for j in range(height):
+            r[i][j], g[i][j], b[i][j] = slika.getpixel((i,j))
+            r1[a] = r1[a] + (r[i][j])
+            g1[a] = g1[a] + (g[i][j])
+            b1[a] = b1[a] + (b[i][j])
+            a = a + 1
+    count = count + 1
+    print(count)
+
+a = 0
+    
+for i in range(a):
+    r1[i] = r1[i]/count
+    g1[i] = g1[i]/count
+    b1[i] = b1[i]/count
+    
+for x in range(width):
+        for y in range(height):
+            pixels[x,y] =  int(r1[a]), int(g1[a]), int(b1[a])
+            a = a + 1
+
+slika = slika.save("MDARK.png")
+
+##########################
+
+import cv2
+
+slika = cv2.imread('C:/Users/djordje/Desktop/DARK/2021-08-18-2014_5-CapObj_0397.png')
+a = np.zeros(10)
+for i in range(len(a)):
+    cv2.imwrite(f'C:/Users/djordje/Desktop/DARK/slika_{i}.png', slika)
+    
+######################
+
+
+import cv2
+MDARK = Image.open("MDARK.png")
+width, height = MDARK.size
+#print(width,height)
+pixels = MDARK.load()
+
+count =  0
+
+for img in glob.glob("C:/Users/djordje/Desktop/LIGHT/*.png"):
+    
+    slika = cv2.imread(img)
+    slika1 = Image.open(img)
+    
+    for i in range(width):
+        if(i == width):
+            break
+        for j in range(height):
+
+            x, y, z = slika1.getpixel((i,j))
+            
+            a, b, c = pixels[i, j]
+            
+            a1 = int(x) - a
+            b1 = int(y) - b
+            c1 = int(z) - c
+            
+            slika[j, i] = ((a1), (b1), (c1))
+    print(count)
+    count = count + 1
+    cv2.imwrite(f'C:/Users/djordje/Desktop/LIGHTs/slika_{count}.png', slika)  
