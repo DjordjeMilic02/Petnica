@@ -1,0 +1,68 @@
+from PIL import Image
+
+slika = Image.open("unnamed.png")
+
+sr = 0
+sg = 0
+sb = 0
+
+width, height = slika.size
+num = width * height
+
+i=0
+j=0
+
+for i in range (width):
+    for j in range (height):
+        r, g, b = slika.getpixel((i, j))
+        sr = sr + r
+        sg = sg + g
+        sb = sb + b
+
+kor_r = (sr/num)*0.9
+kor_g = (sg/num)*0.9
+kor_b = (sb/num)*0.9
+print(kor_r, kor_g, kor_b)
+slika.save("Test_sum.png")
+
+#################################
+
+spektar = Image.open("M3312.png")
+pixels = spektar.load()
+width1, height1 = spektar.size
+sumy = 0
+yosa = []
+for x in range (width1):
+    sumy=0
+    for y in range (height1):
+        r, g, b, a = spektar.getpixel((x, y))
+        pixels[x,y] = (int(max(0, r-kor_r)), int(max(0,g-kor_g)), int(max(0,b-kor_b)))
+        r1, g1, b1, a1 = spektar.getpixel((x, y))
+        gray = 0.2989 * r1 + 0.5870 * g1 + 0.1140 * b1
+        sumy = sumy + gray
+    yosa.append(sumy)
+spektar.save("Spektar_red.png")
+spektar.show()
+
+###############################3
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+xosa = []
+for x in range (width1):
+    xosa.append(int(x*0.45)-3)
+
+
+plt.figure(figsize=(10,10))
+plt.plot(xosa ,yosa)
+plt.xlabel('Talasna duzina (nanometri)')
+plt.ylabel('Intenzitet spektra (arbitratne jedinice)')
+plt.title('Spektar')
+plt.show()
+
+img = mpimg.imread('Spektar_red.png')
+imgplot = plt.imshow(img)
+plt.show()
+
+##################################
