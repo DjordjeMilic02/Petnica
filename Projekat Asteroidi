@@ -1,0 +1,448 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+a = np.loadtxt("NEO.txt",skiprows = 1)
+a11 = []
+for i in range(len(a)):
+    if(a[i]>1):
+        a11.append(a[i])
+plt.hist(a11, bins = 100)
+plt.show()
+
+
+
+##########################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+def f1(x, a, b, c, d):
+    return a * (np.exp(b + c*x)) + d
+
+
+R = 10
+W = 10
+
+a = np.loadtxt("KRATERI.txt")
+a11 = []
+for i in range(len(a)):
+    if(a[i]>R):
+        a11.append(a[i])
+counts, bins, bars = plt.hist(a11, bins = range(int(min(a)), int(max(a)) + W, W))
+plt.show()
+maxc = 0
+
+b = []
+for i in range(len(counts)):
+    if(counts[i] > maxc):
+        maxc = counts[i]
+print(maxc)
+
+for i in range(len(counts)):
+    counts[i]=counts[i]/maxc
+    counts[i]=counts[i]+1/maxc
+    b.append(R+i*W)
+
+    
+j=1
+for j in range(len(counts)):
+    counts[j-1]=counts[j]
+
+x2 = []
+y2 = []
+    
+for i in range(len(b)):
+    if(b[i] < 400):
+        x2.append(b[i]/400)
+        y2.append(counts[i])
+    
+plt.plot(x2,y2,'.')    
+    
+popt, pcov = curve_fit(f1, x2, y2, p0 = [1, -0.005, -0.05, 0], method = 'trf')
+
+absolute_sigma=True
+
+x1 = np.linspace(0, 1, 100)
+y1 = f1(x1, popt[0], popt[1], popt[2], popt[3])
+plt.plot(x1,y1)
+    
+y = np.log(y2)
+fit = np.polyfit(x2, y, 1)
+#plt.plot(x2,y2,'.')
+
+plt.title("Fit normiranog histograma za meseceve kratere")
+plt.xlabel("normiran precnik kratera")
+plt.ylabel("normiran broj kratera")
+plt.show()
+
+print(popt)
+
+perr = np.sqrt(np.diag(pcov))
+
+print(perr)
+
+
+#################################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+def f1(x, a, b, c, d):
+    return a * (np.exp(b + c*x)) + d
+
+
+R = 1
+W = 1
+
+a = np.loadtxt("NEO.txt")
+a11 = []
+for i in range(len(a)):
+    if(a[i]>R):
+        a11.append(a[i])
+counts, bins, bars = plt.hist(a11, bins = range(int(min(a)), int(max(a)) + W, W))
+plt.show()
+maxc = 0
+
+b = []
+for i in range(len(counts)):
+    if(counts[i] > maxc):
+        maxc = counts[i]
+print(maxc)
+
+for i in range(len(counts)):
+    counts[i]=counts[i]/maxc
+    counts[i]=counts[i]+1/maxc
+    b.append(R+i*W)
+
+    
+j=1
+for j in range(len(counts)):
+    counts[j-1]=counts[j]
+
+x2 = []
+y2 = []
+    
+for i in range(len(b)):
+    if(b[i] < 25):
+        x2.append(b[i]/25)
+        y2.append(counts[i])
+    
+plt.plot(x2,y2,'.') 
+    
+popt, pcov = curve_fit(f1, x2, y2, p0 = [1, -0.005, -0.05, 0], method = 'trf')
+    
+x1 = np.linspace(0, 1, 100)
+y1 = f1(x1, popt[0], popt[1], popt[2], popt[3])
+plt.plot(x1,y1)
+    
+y = np.log(y2)
+fit = np.polyfit(x2, y, 1)
+#plt.plot(x2,y2,'.')
+
+
+plt.title("Fit normiranog histograma za NEOove")
+plt.xlabel("normiran precnik NEOova")
+plt.ylabel("normiran broj NEOova")
+plt.show()
+
+print(popt)
+
+
+perr = np.sqrt(np.diag(pcov))
+
+print(perr)
+
+##########################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+
+a1 = [ 1.57455347e+00,  3.85866710e-01, -3.38832613e+01,  2.77185686e-03]
+a2 = [ 1.59094168e+00,  5.55589875e-01, -2.56629730e+01,  7.07301760e-03]
+
+def f1(x):
+    return a1[0] * (np.exp(a1[1] + a1[2]*x)) + a1[3]
+def f2(x):
+    return a2[0] * (np.exp(a2[1] + a2[2]*x)) + a2[3]
+
+def ff(x, a, b, c):
+    return a + b*x**c
+
+x = np.linspace(0, 1, 100)
+y1 = f1(x)
+y2 = f2(x)
+
+plt.plot(x, y1)
+plt.plot(x, y2)
+
+
+plt.title("Grafik koji poredi fitove ranije normiranih histograma")
+plt.xlabel("Normirani precnici Kratera/NEOa")
+plt.ylabel("Normiran broj Kratera/NEOa")
+plt.show()
+
+xk = y2 * 25
+yk = y1 * 400
+
+popt, pcov = curve_fit(ff, xk, yk, p0 = [0, 16, 1], method = 'trf')
+
+plt.plot(xk, yk, '.')
+
+xt = np.linspace(0, 70, 700)
+yt = ff(xt, popt[0], popt[1], popt[2])
+plt.plot(xt,yt)
+
+
+plt.title("Fit zavisnosti precnika precnika kratera od precnika NEOa")
+plt.xlabel("Ocekivan precnik kratera")
+plt.ylabel("Occekivan precnik NEOa")
+plt.show()
+
+print(popt)
+
+perr = np.sqrt(np.diag(pcov))
+
+print(perr)
+
+#################################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+a1 = [0.7057027,  3.34471606, 1.32617502]
+a2 = [10.61, 1.16]
+
+def f1(x):
+    return a1[0] + a1[1]*x**a1[2]
+def f2(x):
+    return a2[0]*x**a2[1]
+
+x = np.linspace(0, 60, 600)
+
+y1 = f1(x)
+y2 = f2(x)
+
+
+plt.plot(x, y1)
+plt.plot(x, y2)
+
+
+plt.title("Poredjenje zavisnosti precnika impaktora i velicine kratera (plavo = Mesec, narandzasto = Zemlja)")
+plt.xlabel("Precnik impaktora")
+plt.ylabel("Precnik kratera")
+plt.show()
+
+##############################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+a = np.loadtxt("Asteroidi_Z.txt")
+k = np.loadtxt("Krateri_Z.txt")
+
+
+def f(x, a, b, c):
+    return a + b*x**c
+
+popt, pcov = curve_fit(f, a, k, method = 'trf')
+
+xt1 = np.linspace(0, 20, 200)
+yt1 = f(xt, popt[0], popt[1], popt[2])
+
+plt.plot(a,k,'.')
+plt.plot(xt1,yt1)
+
+
+plt.title("Fit zavisnosti precnika precnika kratera od precnika asteroida (podaci za Zemlju preuzeti iz ranije poslaog rada)")
+plt.xlabel("Precnik asteroida")
+plt.ylabel("Precnik NEOa")
+plt.show()
+print(popt)
+
+perr = np.sqrt(np.diag(pcov))
+
+print(perr)
+
+########################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+a1 = [0.08923819, 10.4917693, 1.16390759]
+a2 = [10.61, 1.16]
+
+def f1(x):
+    return a1[0] + a1[1]*x**a1[2]
+def f2(x):
+    return a2[0]*x**a2[1]
+
+x = np.linspace(0, 60, 600)
+
+y1 = f1(x)
+y2 = f2(x)
+
+
+plt.plot(y1, y2)
+plt.show()
+
+#####################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+#[ 1.59094168e+00  5.55589875e-01 -2.56629730e+01  7.07301760e-03]
+# 1.57455347e+00  3.85866710e-01 -3.38832613e+01  2.77185686e-03
+
+a2 = [ 1.57455347e+00,  3.85866710e-01, -3.38832613e+01]
+a1 = [ 1.59094168e+00,  5.55589875e-01, -2.56629730e+01]
+
+
+def f1(x):
+    return a1[0] * (np.exp(a1[1] + a1[2]*x))
+def f2(x):
+    return a2[0] * (np.exp(a2[1] + a2[2]*x))
+
+x = np.linspace(0, 0.5, 1000)
+
+def integral(x, a, b, c):
+    return (a/c)*(np.exp(b + c*x)-np.exp(b))
+
+def integralinf(a, b, c):
+    return -(a/c)*np.exp(b)
+
+int1 = integralinf(a1[0], a1[1], a1[2])
+print(int1)
+
+int2 = integralinf(a2[0], a2[1], a2[2])
+print(int2)
+
+def ff(x, a, b, c):
+    return a + b*x**c
+
+xff = []
+yff = []
+
+intmin = 0.01
+jk = 0
+
+for i in range(len(x)):
+    
+    intmin = 1
+    jk = 0
+    relx = integral(x[i], a1[0], a1[1], a1[2]) / int1
+    xff.append((relx)*25)
+    for j in range(len(x)):
+        rely = integral(x[j], a2[0], a2[1], a2[2]) / int2
+        if(abs(rely - relx) < intmin):
+                intmin = abs(rely - relx)
+                jk = j  
+    rely = integral(x[jk], a2[0], a2[1], a2[2]) / int2
+    yff.append((rely)*400)    
+
+    
+plt.plot(xff, yff)
+plt.title("final")
+
+a = np.loadtxt("Asteroidi_Z.txt")
+k = np.loadtxt("Krateri_Z.txt")
+
+
+def f(x, a, b, c):
+    return a + b*x**c
+
+popt, pcov = curve_fit(ff, a, k, method = 'trf')
+
+xt1 = np.linspace(0, 25, 700)
+yt1 = f(xt1, popt[0], popt[1], popt[2])
+
+plt.plot(a,k,'.')
+plt.plot(xt1,yt1)
+plt.show()
+
+#xk = y2 * 25
+#yk = y1 * 400
+
+
+
+popt, pcov = curve_fit(ff, xff, yff, p0 = [0, 16, 1], method = 'trf')
+
+#plt.plot(xk, yk, '.')
+
+xt = np.linspace(0, 25, 700)
+yt = ff(xt, popt[0], popt[1], popt[2])
+#plt.plot(xt,yt)
+
+
+#plt.title("Fit zavisnosti precnika precnika kratera od precnika NEOa")
+#plt.xlabel("Ocekivan precnik NEOa")
+#plt.ylabel("Occekivan precnik kratera")
+#plt.show()
+
+print(popt)
+
+perr = np.sqrt(np.diag(pcov))
+
+print(perr)
+
+################################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+#[ 1.59094168e+00  5.55589875e-01 -2.56629730e+01  7.07301760e-03]
+# 1.57455347e+00  3.85866710e-01 -3.38832613e+01  2.77185686e-03
+
+a2 = [ 1.57455347e+00,  3.85866710e-01, -3.38832613e+01]
+a1 = [ 1.59094168e+00,  5.55589875e-01, -2.56629730e+01]
+
+
+def f1(x):
+    return a1[0] * (np.exp(a1[1] + a1[2]*x))
+def f2(x):
+    return a2[0] * (np.exp(a2[1] + a2[2]*x))
+
+x = np.linspace(0, 0.5, 3000)
+
+def integral(x, a, b, c):
+    return (a/c)*(np.exp(b + c*x)-np.exp(b))
+
+def integralinf(a, b, c):
+    return -(a/c)*np.exp(b)
+
+int1 = integralinf(a1[0], a1[1], a1[2])
+
+int2 = integralinf(a2[0], a2[1], a2[2])
+
+def ff(x, a, b, c):
+    return a + b*x**c
+
+xff = integral(x, a1[0], a1[1], a1[2]) / int1
+yff = integral(x, a2[0], a2[1], a2[2]) / int2
+
+
+plotx = []
+ploty = []
+intmin = 0
+jk = 0
+
+for i in range (len(xff)):
+    intmin = 1
+    plotx.append(i/6000*25)
+    for j in range(len(yff)):
+        if(abs(xff[i] - yff[j]) < intmin):
+                intmin = abs(xff[i] - yff[j])
+                jk = j
+    ploty.append(jk/6000*400)
+
+plt.plot(plotx, ploty)
+plt.show()
+    
